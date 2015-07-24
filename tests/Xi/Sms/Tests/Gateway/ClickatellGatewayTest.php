@@ -13,16 +13,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 */
-	public function parseResponse6()
-	{
-		$response = ClickatellGateway::parseResponse("OK: CE07B3BFEFF35F4E2667B3A47116FDD2");
-		$this->assertEquals('CE07B3BFEFF35F4E2667B3A47116FDD2', $response['OK']);
-	}
-
-	/**
-	 * @test
-	 */
-	public function authenticate2()
+	public function authenticateFail()
 	{
 		$gateway = new ClickatellGateway('lussavain', 'lussuta', 'tussia');
 
@@ -49,14 +40,13 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 			)
 			->will($this->returnValue(''));
 
-		$this->setExpectedException('Xi\Sms\RuntimeException');
-		$ret = $gateway->authenticate();
+		$this->assertFalse($gateway->authenticate());
 	}
 
 	/**
 	 * @test
 	 */
-	public function authenticate1()
+	public function authenticateOk()
 	{
 		$gateway = new ClickatellGateway('lussavain', 'lussuta', 'tussia', 'http://api.dr-kobros.com');
 
@@ -83,14 +73,13 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 			)
 			->will($this->returnValue('OK: QWERTYUI12345678'));
 
-		$ret = $gateway->authenticate();
-		$this->assertEquals('QWERTYUI12345678', $ret);
+		$this->assertEquals('QWERTYUI12345678', $gateway->authenticate());
 	}
 
 	/**
 	 * @test
 	 */
-	public function sendMultiple2()
+	public function sendMultipleMoreThan100()
 	{
 		$gateway = new ClickatellGateway('lussavain', 'lussuta', 'tussia', 'http://api.dr-kobros.com');
 
@@ -130,7 +119,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 */
-	public function sendMultiple1()
+	public function sendMultiple()
 	{
 		$gateway = new ClickatellGateway('lussavain', 'lussuta', 'tussia', 'http://api.dr-kobros.com');
 
@@ -164,7 +153,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 */
-	public function parseResponse5()
+	public function parseResponseMassSendingError()
 	{
 		$response = ClickatellGateway::parseResponse("ERR: 114, Cannot route message To: 49123456789\nERR: 567, Bla bla bla To: 4987654321");
 		$this->assertEquals('114, Cannot route message', $response['ERR']['49123456789']);
@@ -174,7 +163,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 */
-	public function parseResponse4()
+	public function parseResponseMassSendingId()
 	{
 		$response = ClickatellGateway::parseResponse("ID: CE07B3BFEFF35F4E2667B3A47116FDD2 To: 49123456789\nID: QWERTYUIO123456789ASDFGHJK To: 4987654321");
 		$this->assertEquals('CE07B3BFEFF35F4E2667B3A47116FDD2', $response['ID']['49123456789']);
@@ -184,16 +173,25 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 */
-	public function parseResponse3()
+	public function parseResponseErrorParse()
 	{
-		$this->setExpectedException('Xi\Sms\RuntimeException');
 		$response = ClickatellGateway::parseResponse('foo bar');
+		$this->assertFalse($response);
 	}
 
 	/**
 	 * @test
 	 */
-	public function parseResponse2()
+	public function parseResponseOK()
+	{
+		$response = ClickatellGateway::parseResponse("OK: CE07B3BFEFF35F4E2667B3A47116FDD2");
+		$this->assertEquals('CE07B3BFEFF35F4E2667B3A47116FDD2', $response['OK']);
+	}
+
+	/**
+	 * @test
+	 */
+	public function parseResponseId()
 	{
 		$response = ClickatellGateway::parseResponse('ID: CE07B3BFEFF35F4E2667B3A47116FDD2');
 		$this->assertEquals('CE07B3BFEFF35F4E2667B3A47116FDD2', $response['ID']);
@@ -202,7 +200,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 */
-	public function parseResponse1()
+	public function parseResponseErrorApi()
 	{
 		$response = ClickatellGateway::parseResponse('ERR: 114, Cannot route message');
 		$this->assertEquals('114, Cannot route message', $response['ERR']);
@@ -249,7 +247,6 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
             '358503028030'
         );
 
-        $ret = $gateway->send($message);
-        $this->assertEquals('QWERTYUI12345678', $ret);
+        $this->assertTrue($gateway->send($message));
     }
 }

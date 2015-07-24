@@ -5,13 +5,14 @@
  *
  * For copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * This class implements Clickatell API
+ * @link https://www.clickatell.com/downloads/http/Clickatell_HTTP.pdf
  */
 
 namespace Xi\Sms\Gateway;
 
-use Xi\Sms\RuntimeException;
 use Xi\Sms\SmsMessage;
-use Xi\Sms\SmsException;
 
 class ClickatellGateway extends BaseHttpRequestGateway
 {
@@ -50,7 +51,7 @@ class ClickatellGateway extends BaseHttpRequestGateway
 	/**
 	 * Authentication
 	 * @return array
-	 * @throws SmsException
+	 * @return bool|string Success|Session ID
 	 */
 	public function authenticate()
 	{
@@ -66,11 +67,14 @@ class ClickatellGateway extends BaseHttpRequestGateway
 		);
 
 		$response = $this->parseResponse($response_string);
+		if ($response === false) {
+			return false;
+		}
 		if (!empty($response['ERR'])) {
-			throw new RuntimeException(sprintf('Error(s): %s', var_export($response['ERR'], true)));
+			return false;
 		}
 		if (empty($response['OK'])) {
-			throw new RuntimeException('Error: No Session ID returned');
+			return false;
 		}
 		return $response['OK'];
 	}
@@ -78,22 +82,21 @@ class ClickatellGateway extends BaseHttpRequestGateway
     /**
      * @see GatewayInterface::send
 	 * @param SmsMessage $message
+	 * @return bool Success
      */
     public function send(SmsMessage $message)
     {
 		// Sending is limited to max 100 addressees
 		if (count($message->getTo()) > 100) {
-			$return = array();
 			foreach (array_chunk($message->getTo(), 100) as $tos) {
 				$message_alt = new SmsMessage(
 					$message->getBody(),
 					$message->getFrom(),
 					$tos
 				);
-				$response = $this->send($message_alt);
-				$return = array_merge($return, $response);
+				$this->send($message_alt);
 			}
-			return $return;
+			return true;
 		}
 
 		$params = array(
@@ -111,19 +114,19 @@ class ClickatellGateway extends BaseHttpRequestGateway
 		);
 		$response = $this->parseResponse($response_string);
 		if (!empty($response['ERR'])) {
-			throw new RuntimeException(sprintf('Error(s): %s', var_export($response['ERR'], true)));
+			return false;
 		}
 		if (empty($response['ID'])) {
-			throw new RuntimeException('Error: No message ID returned');
+			return false;
 		}
-		return $response['ID'];
+		return true;
     }
 
 	/**
 	 * Parses a Clickatell HTTP API response
 	 * @param string $response
 	 * @return array error messages, messages IDs, phone numbers...
-	 * @throws SmsException
+	 * @return bool|array Success|Parsed API response
 	 */
 	public static function parseResponse($response) {
 		$return = array(
@@ -149,7 +152,7 @@ class ClickatellGateway extends BaseHttpRequestGateway
 			}
 			return $return;
 		} else {
-			throw new RuntimeException(sprintf('Could not parse response: %s', $response));
+			return false;
 		}
 	}
 }
