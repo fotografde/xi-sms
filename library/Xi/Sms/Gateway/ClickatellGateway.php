@@ -85,8 +85,11 @@ class ClickatellGateway extends BaseHttpRequestGateway
 		if (count($message->getTo()) > 100) {
 			$return = array();
 			foreach (array_chunk($message->getTo(), 100) as $tos) {
-				$message_alt = clone $message;
-				$message_alt->addTo($tos);
+				$message_alt = new SmsMessage(
+					$message->getBody(),
+					$message->getFrom(),
+					$tos
+				);
 				$response = $this->send($message_alt);
 				$return = array_merge($return, $response);
 			}
