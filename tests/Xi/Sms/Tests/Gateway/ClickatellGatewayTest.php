@@ -49,7 +49,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 			)
 			->will($this->returnValue(''));
 
-		$this->setExpectedException('Xi\Sms\SmsException');
+		$this->setExpectedException('Xi\Sms\RuntimeException');
 		$ret = $gateway->authenticate();
 	}
 
@@ -186,7 +186,7 @@ class ClickatellGatewayTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function parseResponse3()
 	{
-		$this->setExpectedException('Xi\Sms\SmsException');
+		$this->setExpectedException('Xi\Sms\RuntimeException');
 		$response = ClickatellGateway::parseResponse('foo bar');
 	}
 

@@ -9,6 +9,7 @@
 
 namespace Xi\Sms\Gateway;
 
+use Xi\Sms\RuntimeException;
 use Xi\Sms\SmsMessage;
 use Xi\Sms\SmsException;
 
@@ -66,10 +67,10 @@ class ClickatellGateway extends BaseHttpRequestGateway
 
 		$response = $this->parseResponse($response_string);
 		if (!empty($response['ERR'])) {
-			throw new SmsException(sprintf('Error(s): %s', var_export($response['ERR'], true)));
+			throw new RuntimeException(sprintf('Error(s): %s', var_export($response['ERR'], true)));
 		}
 		if (empty($response['OK'])) {
-			throw new SmsException('Error: No Session ID returned');
+			throw new RuntimeException('Error: No Session ID returned');
 		}
 		return $response['OK'];
 	}
@@ -85,7 +86,7 @@ class ClickatellGateway extends BaseHttpRequestGateway
 			$return = array();
 			foreach (array_chunk($message->getTo(), 100) as $tos) {
 				$message_alt = clone $message;
-				$message_alt->setTo($tos);
+				$message_alt->addTo($tos);
 				$response = $this->send($message_alt);
 				$return = array_merge($return, $response);
 			}
@@ -107,10 +108,10 @@ class ClickatellGateway extends BaseHttpRequestGateway
 		);
 		$response = $this->parseResponse($response_string);
 		if (!empty($response['ERR'])) {
-			throw new SmsException(sprintf('Error(s): %s', var_export($response['ERR'], true)));
+			throw new RuntimeException(sprintf('Error(s): %s', var_export($response['ERR'], true)));
 		}
 		if (empty($response['ID'])) {
-			throw new SmsException('Error: No message ID returned');
+			throw new RuntimeException('Error: No message ID returned');
 		}
 		return $response['ID'];
     }
@@ -145,7 +146,7 @@ class ClickatellGateway extends BaseHttpRequestGateway
 			}
 			return $return;
 		} else {
-			throw new SmsException(sprintf('Could not parse response: %s', $response));
+			throw new RuntimeException(sprintf('Could not parse response: %s', $response));
 		}
 	}
 }
