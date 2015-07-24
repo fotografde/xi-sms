@@ -1,5 +1,5 @@
 {
-    "name": "fotografde/xi-sms",
+    "name": "xi/sms",
     "type": "library",
     "description": "Short messaging for PHP 5.3",
     "keywords": ["SMS"],
