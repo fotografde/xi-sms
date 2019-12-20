@@ -30,17 +30,27 @@ class SmsMessage
     private $to = array();
 
     /**
+     * @var array
+     */
+    private $mediaObjects = array();
+
+    /**
      * @param string $body
      * @param string $from
      * @param array|string $to
+     * @param string[]|string $mediaObjects
      */
-    public function __construct($body = null, $from = null, $to = array())
+    public function __construct($body = null, $from = null, $to = array(), $mediaObjects = array())
     {
         $this->body = $body;
         $this->from = $from;
 
         if ($to) {
             $this->setTo($to);
+        }
+
+        if ($mediaObjects) {
+            $this->setMediaObjects($mediaObjects);
         }
     }
 
@@ -103,5 +113,24 @@ class SmsMessage
     public function getFrom()
     {
         return $this->from;
+    }
+
+    /**
+     * @param string|string[] $mediaObjects
+     */
+    public function setMediaObjects($mediaObjects)
+    {
+        if (!is_array($mediaObjects)) {
+            $mediaObjects = array($mediaObjects);
+        }
+        $this->mediaObjects = $mediaObjects;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMediaObjects()
+    {
+        return $this->mediaObjects;
     }
 }

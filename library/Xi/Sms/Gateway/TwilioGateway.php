@@ -66,7 +66,7 @@ class TwilioGateway extends BaseHttpRequestGateway
     {
         $return = array();
         foreach ($message->getTo() as $to) {
-            $message_id = $this->sendMessage($message->getFrom(), $to, $message->getBody());
+            $message_id = $this->sendMessage($message->getFrom(), $to, $message->getBody(), $message->getMediaObjects());
             $return[] = $message_id;
         }
         if (count($message->getTo()) === 1) {
@@ -79,10 +79,11 @@ class TwilioGateway extends BaseHttpRequestGateway
      * @param string $from
      * @param string $to
      * @param string $content
+     * @param string[] $mediaObjectUrls
      * @return string|null
      * @throws SmsException
      */
-    protected function sendMessage($from, $to, $content) 
+    protected function sendMessage($from, $to, $content, $mediaObjectUrls)
     {
         try {
             $client = $this->getTwilioClient();
@@ -94,6 +95,7 @@ class TwilioGateway extends BaseHttpRequestGateway
             'from' => '+' . $this->numberFrom,
             // the body of the text message you'd like to send
             'body' => $content,
+            'mediaUrl' => $mediaObjectUrls,
         );
         if ($this->messagingServiceId) {
             $params['messagingServiceSid'] = $this->messagingServiceId;
