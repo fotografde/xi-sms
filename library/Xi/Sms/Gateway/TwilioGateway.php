@@ -32,36 +32,36 @@ class TwilioGateway extends BaseHttpRequestGateway
      */
     private $numberFrom;
 
-	/**
-	 * @var string|null
-	 */
-	private $messagingServiceSid;
+    /**
+     * @var string|null
+     */
+    private $messagingServiceSid;
 
-	/**
-	 * @var string|null
-	 */
-	private $statusCallback;
+    /**
+     * @var string|null
+     */
+    private $statusCallback;
 
     /**
      * TwilioGateway constructor.
      * @param string $accountSid Your Account SID from twilio.com/console
      * @param string $authToken Your Auth Token from twilio.com/console
      * @param string $numberFrom A Twilio phone number you purchased at twilio.com/console
-	 * @param string|null $messagingServiceSid Messaging service SID to use for sending
-	 * @param string|null $statusCallback The URL Twilio calls to send delivery status information
+     * @param string|null $messagingServiceSid Messaging service SID to use for sending
+     * @param string|null $statusCallback The URL Twilio calls to send delivery status information
      */
     public function __construct(
         $accountSid,
         $authToken,
         $numberFrom,
-		$messagingServiceSid = null,
+        $messagingServiceSid = null,
         $statusCallback = null
     ) {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;
         $this->numberFrom = $numberFrom;
-		$this->messagingServiceSid = $messagingServiceSid;
-		$this->statusCallback = $statusCallback;
+        $this->messagingServiceSid = $messagingServiceSid;
+        $this->statusCallback = $statusCallback;
     }
 
     /**
@@ -106,9 +106,9 @@ class TwilioGateway extends BaseHttpRequestGateway
         if ($this->messagingServiceSid) {
             $params['messagingServiceSid'] = $this->messagingServiceSid;
         }
-		if ($this->statusCallback) {
-			$params['statusCallback'] = $this->statusCallback;
-		}
+        if ($this->statusCallback) {
+            $params['statusCallback'] = $this->statusCallback;
+        }
 
         // Use the client to do fun stuff like send text messages!
         $MessageInstance = $client->messages->create(
