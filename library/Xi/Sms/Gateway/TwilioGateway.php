@@ -35,25 +35,33 @@ class TwilioGateway extends BaseHttpRequestGateway
     /**
      * @var string|null
      */
-    private $messagingServiceId;
+    private $messagingServiceSid;
+
+    /**
+     * @var string|null
+     */
+    private $statusCallback;
 
     /**
      * TwilioGateway constructor.
      * @param string $accountSid Your Account SID from twilio.com/console
      * @param string $authToken Your Auth Token from twilio.com/console
      * @param string $numberFrom A Twilio phone number you purchased at twilio.com/console
-     * @param string|null $messagingServiceId Messaging service SIDa
+     * @param string|null $messagingServiceSid Messaging service SID to use for sending
+     * @param string|null $statusCallback The URL Twilio calls to send delivery status information
      */
     public function __construct(
         $accountSid,
         $authToken,
         $numberFrom,
-        $messagingServiceId = null
+        $messagingServiceSid = null,
+        $statusCallback = null
     ) {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;
         $this->numberFrom = $numberFrom;
-        $this->messagingServiceId = $messagingServiceId;
+        $this->messagingServiceSid = $messagingServiceSid;
+        $this->statusCallback = $statusCallback;
     }
 
     /**
@@ -95,8 +103,11 @@ class TwilioGateway extends BaseHttpRequestGateway
             // the body of the text message you'd like to send
             'body' => $content,
         );
-        if ($this->messagingServiceId) {
-            $params['messagingServiceSid'] = $this->messagingServiceId;
+        if ($this->messagingServiceSid) {
+            $params['messagingServiceSid'] = $this->messagingServiceSid;
+        }
+        if ($this->statusCallback) {
+            $params['statusCallback'] = $this->statusCallback;
         }
 
         // Use the client to do fun stuff like send text messages!
