@@ -99,12 +99,13 @@ class TwilioGateway extends BaseHttpRequestGateway
         }
 
         $params = array(
-            'from' => '+' . $this->numberFrom,
             // the body of the text message you'd like to send
             'body' => $content,
         );
         if ($this->messagingServiceSid) {
             $params['messagingServiceSid'] = $this->messagingServiceSid;
+        } else {
+            $params['from'] = '+' . $this->numberFrom;
         }
         if ($this->statusCallback) {
             $params['statusCallback'] = $this->statusCallback;
