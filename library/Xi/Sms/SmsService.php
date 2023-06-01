@@ -70,7 +70,7 @@ class SmsService
             /** @var FilterInterface $filter */
             if (!$filter->accept($message)) {
                 $event = new FilterEvent($message, $filter);
-                $this->ed->dispatch(Events::FILTER_DENY, $event);
+                $this->ed->dispatch($event, Events::FILTER_DENY);
                 return false;
             }
         }
@@ -79,7 +79,7 @@ class SmsService
 
         if ($ret) {
             $event = new SmsMessageEvent($message);
-            $this->ed->dispatch(Events::SEND, $event);
+            $this->ed->dispatch($event, Events::SEND);
         }
 
         return $ret;
