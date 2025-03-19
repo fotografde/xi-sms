@@ -90,7 +90,7 @@ class TwilioGateway extends BaseHttpRequestGateway
      * @return string|null
      * @throws SmsException
      */
-    protected function sendMessage($from, $to, $content) 
+    protected function sendMessage($from, $to, $content)
     {
         try {
             $client = $this->getTwilioClient();
@@ -105,7 +105,12 @@ class TwilioGateway extends BaseHttpRequestGateway
         if ($this->messagingServiceSid) {
             $params['messagingServiceSid'] = $this->messagingServiceSid;
         } else {
-            $params['from'] = '+' . $this->numberFrom;
+            // SMS short code (phone numbers with 5 or 6 digits) does not have suffix `+`
+            $numberFrom = strlen($this->numberFrom) === 5 || strlen($this->numberFrom) === 6
+                ? $this->numberFrom
+                : '+' . $this->numberFrom;
+
+            $params['from'] = $numberFrom;
         }
         if ($this->statusCallback) {
             $params['statusCallback'] = $this->statusCallback;
@@ -128,7 +133,7 @@ class TwilioGateway extends BaseHttpRequestGateway
      * @return \Buzz\Browser|\Twilio\Rest\Client
      * @throws \Twilio\Exceptions\ConfigurationException
      */
-    protected function getTwilioClient() 
+    protected function getTwilioClient()
     {
         return new \Twilio\Rest\Client($this->accountSid, $this->authToken);
     }
